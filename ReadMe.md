@@ -1,150 +1,107 @@
-\# CampusFeedbacks Backend
-
----
-
-
+# CampusFeedbacks Backend
 
 CampusFeedbacks is a multi-institution feedback management backend system built using Spring Boot.
 
 It is designed for colleges or institutions where admins, instructors, and students interact in a structured system.
 
-
-
 This project mainly focuses on backend architecture, security, role management, and real-world system design.
 
+## What this project does
 
+* Supports multiple institutions.
 
-\## What this project does
+* Each institution has its own:
 
----
+  - admins
 
+  - instructors
 
+  - students
 
-Supports multiple institutions.
+  - courses
 
+  - feedbacks
 
+* Users are separated by roles and institution scope.  
 
-Each institution has its own:
+* All APIs are secured using JWT authentication.
 
-\- admins
+## Roles
 
-\- instructors
 
-\- students
+### Admin
 
-\- courses
+- Create and manage institution
 
-\- feedbacks
+- Create users (students, instructors, admins)
 
+- Manage courses
 
+- Assign instructors to courses
 
-Users are separated by roles and institution scope.  
+- View analytics and feedback stats
 
-All APIs are secured using JWT authentication.
+- Full control inside their institution
 
+### Instructor
 
+- Linked to a user account
 
-\## Roles
+- Assigned to courses
 
----
+- Can view feedback related to their courses
 
+### Student
 
+- Register under an institution
 
-\### Admin
+- Enroll in courses
 
-\- Create and manage institution
+- Submit feedback
 
-\- Create users (students, instructors, admins)
+- View own feedback history
 
-\- Manage courses
+## Main features
 
-\- Assign instructors to courses
+- Institution-based multi-tenant system
 
-\- View analytics and feedback stats
+- JWT authentication with refresh tokens
 
-\- Full control inside their institution
+- Role-based access control (ADMIN / INSTRUCTOR / STUDENT)
 
+- Feedback system with analytics
 
+- Course enrollment system
 
-\### Instructor
+- Institution-scoped data access (no cross-institution access)
 
-\- Linked to a user account
+- Secure APIs using Spring Security
 
-\- Assigned to courses
+- Clean layered architecture (Controller, Service, Repository, DTO, Entity)
 
-\- Can view feedback related to their courses
+- Pagination, filtering, and search APIs
 
+- Analytics queries using JPQL
 
+## Tech stack
 
-\### Student
+- Java
 
-\- Register under an institution
+- Spring Boot
 
-\- Enroll in courses
+- Spring Security
 
-\- Submit feedback
+- JWT (Access Token + Refresh Token)
 
-\- View own feedback history
+- JPA / Hibernate
 
+- MySQL
 
+- Maven
 
-\## Main features
+- REST APIs
 
----
-
-
-
-\- Institution-based multi-tenant system
-
-\- JWT authentication with refresh tokens
-
-\- Role-based access control (ADMIN / INSTRUCTOR / STUDENT)
-
-\- Feedback system with analytics
-
-\- Course enrollment system
-
-\- Institution-scoped data access (no cross-institution access)
-
-\- Secure APIs using Spring Security
-
-\- Clean layered architecture (Controller, Service, Repository, DTO, Entity)
-
-\- Pagination, filtering, and search APIs
-
-\- Analytics queries using JPQL
-
-
-
-\## Tech stack
-
----
-
-
-
-\- Java
-
-\- Spring Boot
-
-\- Spring Security
-
-\- JWT (Access Token + Refresh Token)
-
-\- JPA / Hibernate
-
-\- MySQL
-
-\- Maven
-
-\- REST APIs
-
-
-
-\## Project structure
-
----
-
-
+## Project structure
 
 ```text
 
@@ -162,151 +119,101 @@ security/       -> JWT, filters, security config
 
 utils/          -> helper classes
 
+```
 
+## Authentication flow
 
-\## Authentication flow
+* User registers under an institution
 
----
+* User logs in using email + password
 
+* Server returns:
 
+  - access token (JWT)
 
-1. User registers under an institution
-2. User logs in using email + password
-3. Server returns:
+  - refresh token
 
-&nbsp;  - access token (JWT)
+* Access token is used for API calls
 
-&nbsp;  - refresh token
+* Refresh token is used to generate new access token when expired
 
-Access token is used for API calls
-
-Refresh token is used to generate new access token when expired
-
-
-
-\## Institution logic
-
----
-
-
+## Institution logic
 
 Every user belongs to an institution.
 
 All data access is institution scoped.
 
-
-
 So:
 
+- Admin of one institution cannot access another institution’s data
 
+- Students cannot see other institution’s courses
 
-\- Admin of one institution cannot access another institution’s data
+- Instructors only see their assigned courses and feedbacks
 
-\- Students cannot see other institution’s courses
+## Problem statement
 
-\- Instructors only see their assigned courses and feedbacks
+- Most colleges lack a transparent and structured system to collect and analyze student feedback on instructors and courses.
 
+- Without proper feedback data and analytics, management cannot effectively evaluate teaching quality or make informed improvements.
 
+- CampusFeedbacks provides a secure, institution-based feedback system that enables students to share feedback and helps institutions analyze instructor performance and improve academic quality through data-driven insights.
 
-\## Problem statement
-
----
-
-
-
-Most colleges lack a transparent and structured system to collect and analyze student feedback on instructors and courses.
-
-Without proper feedback data and analytics, management cannot effectively evaluate teaching quality or make informed improvements.
-
-
-
-CampusFeedbacks provides a secure, institution-based feedback system that enables students to share feedback and helps institutions analyze instructor performance and improve academic quality through data-driven insights.
-
-
-
-\## Why this project exists
-
----
-
-
+## Why this project exists
 
 In colleges, students and instructors play a major role in the overall quality of education.
 
 But in most institutions, management does not have a clear and structured way to understand how instructors are actually performing inside classrooms.
 
-
-
 Student feedback is usually collected manually or informally, which leads to:
 
-\- lack of transparency
+- lack of transparency
 
-\- biased or incomplete data
+- biased or incomplete data
 
-\- no proper analytics to take decisions
-
-
+- no proper analytics to take decisions
 
 Because of this, colleges struggle to:
 
-\- identify strong and weak teaching patterns
+- identify strong and weak teaching patterns
 
-\- improve teaching methods
+- improve teaching methods
 
-\- recognize or reward high-performing instructors
+- recognize or reward high-performing instructors
 
-\- take corrective actions where needed
-
-
+- take corrective actions where needed
 
 This project solves that problem by providing a centralized feedback and analytics system where students can submit feedback for courses and instructors, either openly or anonymously.
 
-
-
 The system then converts feedback into structured data and analytics, helping institutions:
 
-\- monitor teaching quality
+- monitor teaching quality
 
-\- track instructor performance over time
+- track instructor performance over time
 
-\- make data-driven decisions instead of assumptions
+- make data-driven decisions instead of assumptions
 
-\- improve both teaching and learning experience
+- improve both teaching and learning experience
 
-
-
-\## Status
-
----
-
-
+## Status
 
 Backend system is complete and tested using real database and Postman.
 
 Core flows implemented:
 
-\- Auth
+- Auth
 
-\- Institution onboarding
+- Institution onboarding
 
-\- User management
+- User management
 
-\- Instructor mapping
+- Instructor mapping
 
-\- Course management
+- Course management
 
-\- Enrollment
+- Enrollment
 
-\- Feedback system
+- Feedback system
 
-\- Analytics APIs
-
-
-
-\## Author
-
----
-
-
-
-Developed as a backend-focused project for learning system design, security, and enterprise backend development using Spring Boot.
+- Analytics APIs
 
