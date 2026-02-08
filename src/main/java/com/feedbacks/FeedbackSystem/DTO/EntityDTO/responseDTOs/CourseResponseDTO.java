@@ -12,6 +12,8 @@ public class CourseResponseDTO {
     private String courseName;
     private String courseDescription;
     private String instructorName;
+    private double avgRating;
+    private long feedbackCount;
     private String deletedAt;
     private String deletedBy;
     private String restoredBy;

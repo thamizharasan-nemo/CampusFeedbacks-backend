@@ -59,4 +59,6 @@ public interface InstructorService {
     );
 
     List<InstructorRankingDTO> getTopRatedInstructor(int page, int size);
+
+    Long getTotalInstructorCountByInstitution();
 }

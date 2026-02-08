@@ -4,6 +4,7 @@ import com.feedbacks.FeedbackSystem.DTO.ApiResponse;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.FeedbackRequestDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackSummary;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.FeedbackResponseDTO;
+import com.feedbacks.FeedbackSystem.DTO.analytics.RatingDistributionDTO;
 import com.feedbacks.FeedbackSystem.service.interfaces.FeedbackService;
 import com.feedbacks.FeedbackSystem.service.serviceImple.FeedbackServiceImpl;
 import jakarta.validation.Valid;
@@ -242,6 +243,15 @@ public class FeedbackController {
                 "Fetched recent feedbacks",
                 feedbackService.getRecentFeedbacksByCourseId(courseId, limit))
         );
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<ApiResponse<Long>> feedbacksCountByInstitution() {
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Total instructor count fetched for institution",
+                feedbackService.countTotalFeedbacksByInstitution()
+        ));
     }
 
 }

@@ -80,9 +80,17 @@ public class EnrollmentMapper {
         response.setEnrollmentId(enrollment.getEnrollId());
         response.setInstitutionId(enrollment.getInstitution().getInstitutionId());
         response.setInstitutionName(enrollment.getInstitution().getInstitutionName());
+
         response.setStudentName(enrollment.getStudent().getUsername());
         response.setStudentRollNo(enrollment.getStudent().getIdentityNo());
+
+        response.setCourseId(enrollment.getCourse().getCourseId());
         response.setCourseName(enrollment.getCourse().getCourseName());
+
+        response.setInstructorId(enrollment.getCourse().getInstructor() != null
+                ? enrollment.getCourse().getInstructor().getInstructorId()
+                : 0
+        );
         response.setInstructorName(
                 enrollment.getCourse().getInstructor() != null
                         ? enrollment.getCourse().getInstructor().getUser().getUsername()

@@ -81,4 +81,6 @@ public interface FeedbackService {
     List<FeedbackTrendDTO> getFeedbackTrends(String groupBy);
 
     List<RatingDistributionDTO> getFeedbackRatings();
+
+    Long countTotalFeedbacksByInstitution();
 }

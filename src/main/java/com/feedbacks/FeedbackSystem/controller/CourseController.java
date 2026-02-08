@@ -95,9 +95,8 @@ public class CourseController {
     }
 
     @DeleteMapping("/{courseId}/deleted")
-    public ResponseEntity<ApiResponse<Void>> deleteCoursePermanentlyById(
-            @PathVariable int courseId,
-            @RequestParam(defaultValue = "true") boolean permanent) {
+    public ResponseEntity<ApiResponse<Void>> deleteCoursePermanentlyById(@PathVariable int courseId,
+                                                                         @RequestParam(defaultValue = "true") boolean permanent) {
 
         courseService.deleteCoursePermanently(courseId);
         return ResponseEntity.ok(
@@ -107,13 +106,14 @@ public class CourseController {
 
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/institution")
+    @GetMapping("/all/institution")
     public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getCoursesByInstitution() {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Institution courses fetched",
                         courseService.getCoursesByInstitution())
         );
     }
+
 
     @GetMapping("/soft/deleted")
     public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getAllDeletedCourses() {
@@ -134,10 +134,8 @@ public class CourseController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{courseId}/instructor/{instructorId}")
-    public ResponseEntity<ApiResponse<CourseResponseDTO>> assignCourse(
-            @PathVariable int courseId,
-            @PathVariable int instructorId) {
-
+    public ResponseEntity<ApiResponse<CourseResponseDTO>> assignCourse(@PathVariable int courseId,
+                                                                       @PathVariable int instructorId) {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Instructor assigned to course",
                         courseService.assignInstructorToCourse(courseId, instructorId))
@@ -145,9 +143,7 @@ public class CourseController {
     }
 
     @PutMapping("/{courseId}/instructor")
-    public ResponseEntity<ApiResponse<CourseResponseDTO>> unassignCourse(
-            @PathVariable int courseId) {
-
+    public ResponseEntity<ApiResponse<CourseResponseDTO>> unassignCourse(@PathVariable int courseId) {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Instructor unassigned from course",
                         courseService.unassignInstructorToCourse(courseId))
@@ -155,7 +151,7 @@ public class CourseController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN','INSTRUCTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN','INSTRUCTOR','STUDENT')")
     @GetMapping("/institution/search")
     public ResponseEntity<ApiResponse<Page<CourseResponseDTO>>> searchCoursesByInstitution(
             @RequestParam(required = false) Integer courseId,
@@ -178,6 +174,18 @@ public class CourseController {
         );
     }
 
+    @GetMapping("/all/sorted")
+    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getAllCoursesSorted(
+            @RequestParam(defaultValue = "courseName") String sortBy,
+            @RequestParam(defaultValue = "ASC") String sortDirection) {
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Courses fetched",
+                        courseService.getAllCoursesSorted(sortBy, sortDirection))
+        );
+    }
+
+
     @GetMapping("/param")
     public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> searchCourse(
             @RequestParam(required = false) Integer courseId,
@@ -192,9 +200,7 @@ public class CourseController {
     }
 
     @GetMapping("/name")
-    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> searchCourseByName(
-            @RequestParam String courseName) {
-
+    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> searchCourseByName(@RequestParam String courseName) {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Courses fetched by name",
                         courseService.searchCourseByName(courseName))

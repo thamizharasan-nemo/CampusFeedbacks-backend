@@ -41,6 +41,10 @@ public class Institution {
 
     private String address;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

@@ -55,14 +55,14 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "courses/all", "/swagger-ui/**",
+                        .requestMatchers("/auth/**", "courses/all", "analytics/**", "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/swagger-ui.html",
                                 "/webjars/**").permitAll()
-                        .requestMatchers("/courses/**").authenticated()
-                        .requestMatchers("/users/**","/enrollments/**").authenticated()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/courses/**").permitAll()
+                        .requestMatchers("/users/**","/enrollments/**").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.httpBasic(httpBasic ->{});

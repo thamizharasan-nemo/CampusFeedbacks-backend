@@ -80,4 +80,6 @@ public interface CourseService {
     List<CourseResponseDTO> findCoursesLessThanAvgRating(Double avgRating);
 
     List<CourseRankingDTO> getCourseRanking(int page, int size);
+
+    List<CourseResponseDTO> getAllCoursesSorted(String sortBy, String sortDirection);
 }

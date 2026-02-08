@@ -107,8 +107,11 @@ public class InstitutionServiceImpl implements InstitutionService {
 
     @Override
     public InstitutionResponseDTO updateInstitution(InstitutionRequestDTO dto) {
-        Institution institution = institutionRepo.findById(SecurityUtils.getInstitutionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Institution not found"));
+        Institution institution = institutionRepo.findByAdminId(SecurityUtils.getCurrentUserId());
+        if (institution == null ){
+            throw new ResourceNotFoundException("Institution not found");
+        }
+
         mapper.toEntity(institution, dto);
         institutionRepo.save(institution);
         return mapper.toResponse(institution);

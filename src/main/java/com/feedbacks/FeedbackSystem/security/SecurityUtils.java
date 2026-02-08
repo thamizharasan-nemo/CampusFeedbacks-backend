@@ -29,7 +29,7 @@ public class SecurityUtils {
         Object principal = auth.getPrincipal();
 
         if (!(principal instanceof CustomUserDetails userDetails)) {
-            throw new IllegalStateException("Invalid principal type");
+            throw new IllegalStateException("Invalid principal type! \nJWT token might not present!\nSpring principal requires userId, instituteId, name and password");
         }
 
         return userDetails;

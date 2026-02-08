@@ -1,5 +1,6 @@
 package com.feedbacks.FeedbackSystem.security;
 
+import com.feedbacks.FeedbackSystem.Exception.ResourceNotFoundException;
 import com.feedbacks.FeedbackSystem.model.User;
 import com.feedbacks.FeedbackSystem.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with email " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email " + email));
 
         return new CustomUserDetails(user);
     }

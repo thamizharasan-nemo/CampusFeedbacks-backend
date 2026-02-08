@@ -63,9 +63,7 @@ public class InstitutionController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping
-    public ResponseEntity<ApiResponse<InstitutionResponseDTO>> updateInstitution(
-            @Valid @RequestBody InstitutionRequestDTO dto) {
-
+    public ResponseEntity<ApiResponse<InstitutionResponseDTO>> updateInstitution(@Valid @RequestBody InstitutionRequestDTO dto) {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true, "Institution updated successfully",
@@ -97,6 +95,25 @@ public class InstitutionController {
         );
     }
 
+    @GetMapping("/total/students")
+    public ResponseEntity<ApiResponse<?>> totalStudents() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true, "Total students in institutions fetched",
+                        institutionService.totalUsers()
+                )
+        );
+    }
+
+    @GetMapping("/total/courses")
+    public ResponseEntity<ApiResponse<?>> totalCourses() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true, "Total courses in institutions fetched",
+                        institutionService.totalCourses()
+                )
+        );
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{institutionId}/stats")

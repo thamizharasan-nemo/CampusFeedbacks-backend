@@ -181,6 +181,14 @@ public class InstructorController {
                         instructorService.searchInstructor(instructorId, instructorName, courseName))
         );
     }
+
+    @GetMapping("/count")
+    public ResponseEntity<ApiResponse<Long>> countInstructorsToInstitution() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Total instructor instructors count fetched",
+                        instructorService.getTotalInstructorCountByInstitution())
+        );
+    }
 }
 
 

@@ -1,9 +1,12 @@
 package com.feedbacks.FeedbackSystem.service.serviceImple;
 
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.EnrollmentRequestDTO;
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.CourseResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.EnrollmentResponseDTO;
+import com.feedbacks.FeedbackSystem.Exception.BadRequestException;
 import com.feedbacks.FeedbackSystem.Exception.NotAllowedException;
 import com.feedbacks.FeedbackSystem.Exception.ResourceNotFoundException;
+import com.feedbacks.FeedbackSystem.mapper.CourseMapper;
 import com.feedbacks.FeedbackSystem.mapper.EnrollmentMapper;
 import com.feedbacks.FeedbackSystem.model.Course;
 import com.feedbacks.FeedbackSystem.model.Enrollment;
@@ -95,8 +98,35 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     }
 
     @Override
+    public List<CourseResponseDTO> getStudentEnrolledCourse() {
+        User student = userService.getUserById(SecurityUtils.getCurrentUserId());
+
+        if (student.getRole() != User.Role.STUDENT){
+            throw new BadRequestException("You're not a STUDENT, only students can get courses");
+        }
+
+        List<Course> courses = enrollmentRepo.findCoursesByStudentId(student.getUserId());
+
+        return courses.stream()
+                .map(courseService::convertToResponse)
+                .toList();
+    }
+
+    @Override
+    public Boolean isEnrolled(int courseId){
+        int studentId = SecurityUtils.getCurrentUserId();
+        int institutionId = SecurityUtils.getInstitutionId();
+        return enrollmentRepo.existsByCourse_CourseIdAndStudent_UserIdAndInstitution_InstitutionId(
+                courseId,
+                studentId,
+                institutionId
+        );
+    }
+
+    @Override
     public EnrollmentResponseDTO enrollToCourse(EnrollmentRequestDTO requestDTO){
         Enrollment enrollment = new Enrollment();
+        requestDTO.setStudentId(SecurityUtils.getCurrentUserId());
         enrollment = enrollmentMapper.toEntity(requestDTO, enrollment);
         if (enrollment == null) {
             throw new ResourceNotFoundException("Enrollment failed");
@@ -111,6 +141,38 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         );
 
         return enrollmentMapper.toResponse(enrollment);
+    }
+
+    @Override
+    public void unrollToCourse(int courseId){
+        int studentId = SecurityUtils.getCurrentUserId();
+        User student = userService.getUserById(studentId);
+        Course course = courseService.getCourseById(courseId);
+        int institutionId = SecurityUtils.getInstitutionId();
+
+        if(!enrollmentRepo.existsByCourse_CourseIdAndStudent_UserIdAndInstitution_InstitutionId(
+                courseId,
+                studentId,
+                institutionId
+        )){
+            throw new NotAllowedException("The student with roll number "+student.getIdentityNo()+" hasn't enrolled to this course "+course.getCourseName());
+        }
+
+        Enrollment enrollment = enrollmentRepo
+                .findByStudent_UserIdAndCourse_CourseIdAndInstitution_InstitutionId(
+                        studentId,
+                        courseId,
+                        institutionId
+                );
+
+        enrollmentRepo.delete(enrollment);
+
+        log.info(
+                "event=UNROLLED_TO_COURSE studentId={} courseId={} enrolledAt={}",
+                enrollment.getStudent().getIdentityNo(),
+                enrollment.getCourse().getCourseId(),
+                enrollment.getEnrollmentDate()
+        );
     }
 
 
@@ -129,36 +191,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         return enrollmentMapper.toResponse(enrollment);
     }
 
-    @Override
-    public void unrollToCourse(EnrollmentRequestDTO requestDTO){
-        User student = userService.getUserById(requestDTO.getStudentId());
-        Course course = courseService.getCourseById(requestDTO.getCourseId());
-        int institutionId = SecurityUtils.getInstitutionId();
-
-        if(!enrollmentRepo.existsByCourse_CourseIdAndStudent_UserIdAndInstitution_InstitutionId(
-                requestDTO.getCourseId(),
-                requestDTO.getStudentId(),
-                institutionId
-        )){
-            throw new NotAllowedException("The student with roll number "+student.getIdentityNo()+" hasn't enrolled to this course "+course.getCourseName());
-        }
-
-        Enrollment enrollment = enrollmentRepo
-                .findByStudent_UserIdAndCourse_CourseIdAndInstitution_InstitutionId(
-                        requestDTO.getStudentId(),
-                        requestDTO.getCourseId(),
-                        institutionId
-                );
-
-        enrollmentRepo.delete(enrollment);
-
-        log.info(
-                "event=UNROLLED_TO_COURSE studentId={} courseId={} enrolledAt={}",
-                enrollment.getStudent().getIdentityNo(),
-                enrollment.getCourse().getCourseId(),
-                enrollment.getEnrollmentDate()
-        );
-    }
 
     @Override
     @org.springframework.transaction.annotation.Transactional(readOnly = true)

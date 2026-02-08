@@ -295,6 +295,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponseDTO> getUsersByInstitution(User.Role role) {
         int institutionId = SecurityUtils.getInstitutionId();
+        System.out.println(userRepo.findByInstitutionAndRole(institutionId, role)
+                .stream()
+                .map(userMapper::toResponse)
+                .toList());
         return userRepo.findByInstitutionAndRole(institutionId, role)
                 .stream()
                 .map(userMapper::toResponse)

@@ -6,6 +6,7 @@ import com.feedbacks.FeedbackSystem.DTO.analytics.PopularCourseDTO;
 import com.feedbacks.FeedbackSystem.model.Course;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -43,6 +44,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
     @Query(value = "DELETE FROM Course c WHERE c.course_id = :courseId", nativeQuery = true)
     void deletePermanently(@Param("courseId")Integer courseId);
 
+
     @Query("SELECT c.courseId AS courseId, " +
             "c.courseName AS courseName, " +
             "COUNT(f) AS feedbackCount, " +
@@ -77,6 +79,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
             SELECT new com.feedbacks.FeedbackSystem.DTO.analytics.CourseRankingDTO(
             c.courseId,
             c.courseName,
+            c.instructor.user.username,
             c.avgRating,
             c.feedbackCount
             )
@@ -85,6 +88,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
             ORDER BY c.avgRating DESC
             """)
     List<CourseRankingDTO> getCourseRaking(Pageable pageable);
+
 
     // Institution-scoped search
     @Query("""
@@ -108,9 +112,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
         WHERE c.institution.institutionId = :institutionId
         GROUP BY c.courseId, c.courseName
     """)
-    List<CourseFeedbackCountDTO> countFeedbacksAndAvgRatePerCourse(
-            @Param("institutionId") Integer institutionId
-    );
+    List<CourseFeedbackCountDTO> countFeedbacksAndAvgRatePerCourse(@Param("institutionId") Integer institutionId);
 
     List<Course> findByInstitution_InstitutionId(Integer institutionId);
 
@@ -120,15 +122,19 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
         SELECT c FROM Course c
         WHERE c.institution.institutionId = :institutionId
     """)
-    List<Course> findByInstitution(Integer institutionId);
+    List<Course> findByInstitution(@Param("institutionId") Integer institutionId);
+
+
+    @Query("""
+        SELECT c FROM Course c
+        WHERE c.institution.institutionId = :institutionId
+    """)
+    List<Course> findByInstitutionSorted(@Param("institutionId") Integer institutionId, Sort sort);
 
     @Query("""
         SELECT c FROM Course c
         WHERE c.institution.institutionId = :institutionId
         AND c.courseName LIKE %:courseName%
     """)
-    List<Course> searchByNameAndInstitution(
-            Integer institutionId,
-            String courseName
-    );
+    List<Course> searchByNameAndInstitution(Integer institutionId, String courseName);
 }

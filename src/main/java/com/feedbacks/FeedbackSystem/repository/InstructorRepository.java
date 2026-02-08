@@ -7,10 +7,7 @@ import com.feedbacks.FeedbackSystem.model.Course;
 import com.feedbacks.FeedbackSystem.model.Instructor;
 import com.feedbacks.FeedbackSystem.model.User;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
@@ -21,6 +18,13 @@ public interface InstructorRepository extends JpaRepository<Instructor, Integer>
         JpaSpecificationExecutor<Instructor> {
 
     Optional<Instructor> findByUser(User user);
+
+    @EntityGraph(attributePaths = {
+            "user",
+            "courses",
+            "courses.institution"
+    })
+    Optional<Instructor> findByInstructorId(int instructorId);
 
     @Query(value = "SELECT i.instructorId AS instructorId, " +
             "i.user.username AS instructorName, " +
@@ -91,4 +95,10 @@ public interface InstructorRepository extends JpaRepository<Instructor, Integer>
     """)
     List<InstructorRankingDTO> getTopRatedInstructor(@Param("institutionId") Integer institutionId, Pageable pageable);
 
+
+    @Query("""
+            SELECT COUNT(i) FROM Instructor i
+            WHERE i.user.institution.institutionId = :institutionId
+            """)
+    Long findCountByInstitutionId(int institutionId);
 }

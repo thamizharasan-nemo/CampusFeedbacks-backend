@@ -29,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -433,7 +434,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     )
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<FeedbackTrendDTO> getFeedbackTrends(String groupBy) {
-        int institutionId = getStudentInstitutionId(SecurityUtils.getCurrentUserId());
+        int institutionId = SecurityUtils.getInstitutionId();
 
         return switch (groupBy.toUpperCase()) {
             case "DAY" -> feedbackRepo.getDailyTrendsByInstitutionId(institutionId);
@@ -458,7 +459,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     public Double avgRatingOfInstructorsLast7days(){
         LocalDateTime sevenDaysLess = LocalDateTime.now().minusDays(7);
         User currentUser = userService.getUserById(getCurrentUserId());
-        return feedbackRepo.avgCourseRatingLast7Days(currentUser.getInstitution().getInstitutionId(), sevenDaysLess);
+        return feedbackRepo.avgInstructorRatingLast7Days(currentUser.getInstitution().getInstitutionId(), sevenDaysLess);
     }
 
     public Double avgRatingOfCoursesLast7days(){
@@ -483,5 +484,10 @@ public class FeedbackServiceImpl implements FeedbackService {
         return feedbacks.stream()
                 .map(feedbackMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    public Long countTotalFeedbacksByInstitution(){
+        return feedbackRepo.findCountByInstitutionId(SecurityUtils.getInstitutionId());
     }
 }

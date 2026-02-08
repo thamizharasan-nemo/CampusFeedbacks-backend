@@ -71,6 +71,10 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.toResponse(course);
     }
 
+    public CourseResponseDTO convertToResponse(Course course){
+        return courseMapper.toResponse(course);
+    }
+
     @Override
     public CourseResponseDTO addCourse(CourseRequestDTO requestDTO) {
         Institution institution = institutionRepo.findById(SecurityUtils.getInstitutionId())
@@ -98,7 +102,6 @@ public class CourseServiceImpl implements CourseService {
 
         return courseMapper.toResponse(courseRepo.save(course));
     }
-
 
 
     @Transactional
@@ -225,9 +228,7 @@ public class CourseServiceImpl implements CourseService {
         Course course = getCourseById(courseId);
         Instructor instructor = instructorRepo.findById(instructorId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Instructor with ID: " + instructorId + " not found."
-                        )
+                        new ResourceNotFoundException("Instructor with ID: " + instructorId + " not found.")
                 );
 
         if (course.getInstitution() == null || instructor.getUser().getInstitution() == null) {
@@ -278,15 +279,32 @@ public class CourseServiceImpl implements CourseService {
 
         Integer institutionId = SecurityUtils.getInstitutionId();
 
-        Specification<Course> specification = Specification.anyOf(
-                CourseSpecification.belongsToInstitution(institutionId),
-                CourseSpecification.hasCourseId(courseId),
-                CourseSpecification.hasInstructorId(instructorId),
-                CourseSpecification.hasCourseName(courseName),
-                CourseSpecification.hasInstructorName(instructorName),
-                CourseSpecification.popularCourse(popular),
-                CourseSpecification.greaterThanAvgRatingCourses(minAvgRating)
-        );
+        Specification<Course> specification = CourseSpecification.belongsToInstitution(institutionId);
+
+        if (courseId != null) {
+            specification = specification.and(CourseSpecification.hasCourseId(courseId));
+        }
+
+        if (courseName != null && !courseName.isEmpty()) {
+            specification = specification.and(CourseSpecification.hasCourseName(courseName));
+        }
+
+        if (instructorId != null) {
+            specification = specification.and(CourseSpecification.hasInstructorId(instructorId));
+        }
+
+        if (instructorName != null && !instructorName.isEmpty()) {
+            specification = specification.and(CourseSpecification.hasInstructorName(instructorName));
+        }
+
+        if (popular != null) {
+            specification = specification.and(CourseSpecification.popularCourse(popular));
+        }
+
+        if (minAvgRating != null) {
+            specification = specification.and(CourseSpecification.greaterThanAvgRatingCourses(minAvgRating));
+        }
+
 
         Page<Course> course = courseRepo.findAll(specification, pageable);
         return course.map(courseMapper::toResponse);
@@ -296,6 +314,24 @@ public class CourseServiceImpl implements CourseService {
     public List<CourseResponseDTO> searchCourseByName(String courseName){
         List<Course> courses = courseRepo.findByCourseNameContainingIgnoreCase(courseName);
         return courses.stream()
+                .map(courseMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<CourseResponseDTO> getAllCoursesSorted(String sortBy, String sortDirection){
+        String sortField = (sortBy == null || sortBy.isBlank())
+                ? "courseName"
+                : sortBy;
+
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDirection)
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortField);
+
+        List<Course> courses = courseRepo.findByInstitutionSorted(SecurityUtils.getInstitutionId(), sort);
+        return courses
+                .stream()
                 .map(courseMapper::toResponse)
                 .toList();
     }

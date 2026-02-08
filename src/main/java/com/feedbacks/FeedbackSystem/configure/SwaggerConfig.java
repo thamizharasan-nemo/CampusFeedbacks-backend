@@ -21,8 +21,8 @@ public class SwaggerConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")))
                 .info(new Info()
-                        .title("Student Feedback Management System")
+                        .title("Smart Feedback Analytics Platform")
                         .version("1.0")
-                        .description("Api documentation for Feedback Management System (Spring Boot)"));
+                        .description("Api documentation for Campus Feedbacks (Spring Boot)"));
     }
 }

@@ -67,7 +67,7 @@ public class InstructorServiceImpl implements InstructorService {
 
     @Override
     public Instructor getInstructorById(Integer instructorId) {
-        return instructorRepo.findById(instructorId)
+        return instructorRepo.findByInstructorId(instructorId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Instructor not found with Id: " + instructorId));
     }
@@ -308,6 +308,10 @@ public class InstructorServiceImpl implements InstructorService {
         return instructorRepo.getTopRatedInstructor(SecurityUtils.getInstitutionId(), PageRequest.of(page, size));
     }
 
+    @Override
+    public Long getTotalInstructorCountByInstitution() {
+        return instructorRepo.findCountByInstitutionId(SecurityUtils.getInstitutionId());
+    }
 
 }
 

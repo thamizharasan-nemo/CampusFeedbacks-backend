@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -148,7 +149,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer>,
                 FROM Feedback f
                 WHERE f.institution.institutionId = :institutionId
                 GROUP BY f.courseRating
-                ORDER BY f.courseRating
+                ORDER BY f.courseRating DESC
             """)
     List<RatingDistributionDTO> getRatingDistribution(int institutionId);
 
@@ -194,7 +195,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer>,
 
 
     @Query("""
-            SELECT AVG(f.instructorRating)
+            SELECT COALESCE(AVG(f.instructorRating), 0.0)
             FROM Feedback f
             WHERE f.institution.institutionId = :institutionId
               AND f.submittedAt >= :fromDate
@@ -202,7 +203,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer>,
     Double avgInstructorRatingLast7Days(int institutionId, LocalDateTime fromDate);
 
     @Query("""
-            SELECT AVG(f.courseRating)
+            SELECT COALESCE(AVG(f.courseRating), 0.0)
             FROM Feedback f
             WHERE f.institution.institutionId = :institutionId
               AND f.submittedAt >= :fromDate
@@ -218,4 +219,10 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer>,
                 ORDER BY f.submittedAt DESC
             """)
     List<Feedback> getRecentFeedbacksByCourse(int courseId, int institutionId, LocalDateTime from);
+
+    @Query("""
+            SELECT COUNT(f) FROM Feedback f
+            WHERE f.institution.institutionId = :institutionId
+            """)
+    Long findCountByInstitutionId(int institutionId);
 }

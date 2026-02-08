@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class FeedbackRateLimiterService {
 
-    private static final int DAILY_LIMIT = 10;
+    private static final int DAILY_LIMIT = 100;
 
     private final StringRedisTemplate redisTemplate;
 

@@ -73,6 +73,8 @@ public class CourseMapper {
                 course.getCourseName(),
                 course.getCourseDescription(),
                 instructorName,
+                course.getAvgRating(),
+                course.getFeedbackCount(),
                 course.getDeletedAt() != null ? course.getDeletedAt().toString() : "Not yet deleted",
                 course.getDeletedBy(),
                 course.getRestoredBy(),

@@ -24,9 +24,12 @@ public class CourseSpecification {
 
     public static Specification<Course> hasCourseName(String courseName) {
         return ((root, query, criteriaBuilder) ->
-                courseName == null || courseName.isEmpty() ? null
-                        : criteriaBuilder
-                        .like(criteriaBuilder.lower(root.get("courseName")), "%"+courseName.toLowerCase()+"%"));
+                courseName == null || courseName.isEmpty()
+                        ? null
+                        : criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("courseName")),
+                        "%"+courseName.toLowerCase()+"%"
+                ));
     }
 
     public static Specification<Course> hasInstructorName(String instructorName) {

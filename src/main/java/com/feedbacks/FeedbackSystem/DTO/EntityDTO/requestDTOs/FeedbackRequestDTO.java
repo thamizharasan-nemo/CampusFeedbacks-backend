@@ -13,14 +13,12 @@ public class FeedbackRequestDTO {
     @Min(1)
     @Max(5)
     private int courseRating;
-
     private String courseComment;
 
     @NotNull
     @Min(1)
     @Max(5)
     private int instructorRating;
-
     private String instructorComment;
 
     private boolean anonymous;

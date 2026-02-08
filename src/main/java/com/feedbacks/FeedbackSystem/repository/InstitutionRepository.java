@@ -1,6 +1,7 @@
 package com.feedbacks.FeedbackSystem.repository;
 
 import com.feedbacks.FeedbackSystem.model.Institution;
+import com.feedbacks.FeedbackSystem.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -37,5 +38,11 @@ public interface InstitutionRepository extends JpaRepository<Institution, Intege
         WHERE c.institution.institutionId = :institutionId
         """)
     Long totalCoursesByInstitution(@Param("institutionId") Integer institutionId);
+
+    @Query("""
+            SELECT i FROM Institution i
+            WHERE i.createdBy.userId = :userId
+            """)
+    Institution findByAdminId(int userId);
 }
 

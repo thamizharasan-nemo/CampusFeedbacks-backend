@@ -2,6 +2,7 @@ package com.feedbacks.FeedbackSystem.controller;
 
 import com.feedbacks.FeedbackSystem.DTO.ApiResponse;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.EnrollmentRequestDTO;
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.CourseResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.EnrollmentResponseDTO;
 import com.feedbacks.FeedbackSystem.model.Enrollment;
 import com.feedbacks.FeedbackSystem.service.interfaces.EnrollmentService;
@@ -47,6 +48,42 @@ public class EnrollmentController {
         );
     }
 
+    @GetMapping("/{courseId}/enrollment-status")
+    public ResponseEntity<ApiResponse<Boolean>> isStudentEnrolledToCourse(@PathVariable("courseId") int courseId){
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Student has enrolled",
+                        enrollmentService.isEnrolled(courseId)
+                )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @PostMapping
+    public ResponseEntity<ApiResponse<EnrollmentResponseDTO>> enrollToCourse(@RequestBody EnrollmentRequestDTO requestDTO) {
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Student enrolled successfully",
+                        enrollmentService.enrollToCourse(requestDTO)
+                )
+        );
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @DeleteMapping("/{courseId}")
+    public ResponseEntity<ApiResponse<String>> unrollFromCourse(@PathVariable int courseId) {
+        enrollmentService.unrollToCourse(courseId);
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        true,
+                        "Student unrolled successfully",
+                        "Enrollment removed"
+                )
+        );
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
     @GetMapping("/student")
     public ResponseEntity<ApiResponse<List<EnrollmentResponseDTO>>> getEnrollmentsByStudentId() {
@@ -56,6 +93,14 @@ public class EnrollmentController {
                         "Student enrollments retrieved",
                         enrollmentService.getAllEnrollmentsByStudentId()
                 )
+        );
+    }
+
+    @GetMapping("/courses/student/enrolled")
+    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getStudentEnrolledCourse() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Student enrolled courses fetched",
+                        enrollmentService.getStudentEnrolledCourse())
         );
     }
 
@@ -94,30 +139,6 @@ public class EnrollmentController {
         );
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
-    @PostMapping
-    public ResponseEntity<ApiResponse<EnrollmentResponseDTO>> enrollToCourse(@RequestBody EnrollmentRequestDTO requestDTO) {
-        return ResponseEntity.ok(
-                new ApiResponse<>(
-                        true,
-                        "Student enrolled successfully",
-                        enrollmentService.enrollToCourse(requestDTO)
-                )
-        );
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
-    @DeleteMapping
-    public ResponseEntity<ApiResponse<String>> unrollFromCourse(@RequestBody EnrollmentRequestDTO requestDTO) {
-        enrollmentService.unrollToCourse(requestDTO);
-        return ResponseEntity.ok(
-                new ApiResponse<>(
-                        true,
-                        "Student unrolled successfully",
-                        "Enrollment removed"
-                )
-        );
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/course/{courseId}/count")
