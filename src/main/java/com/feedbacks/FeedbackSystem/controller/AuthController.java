@@ -81,8 +81,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<JwtResponseDTO>> login(@RequestBody @Valid UserLoginReqDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
@@ -133,11 +132,8 @@ public class AuthController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/tokens/{userId}")
-    public ResponseEntity<ApiResponse<Void>> revokeTokens(
-            @PathVariable int userId
-    ) {
+    public ResponseEntity<ApiResponse<Void>> revokeTokens(@PathVariable int userId) {
         refreshTokenService.revokeAllForUser(userId);
-
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "All refresh tokens revoked", null)
         );

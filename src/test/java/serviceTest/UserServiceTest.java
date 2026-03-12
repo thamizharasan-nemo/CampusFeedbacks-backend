@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -26,7 +27,7 @@ public class UserServiceTest {
     @Test
     void testGetUserById(){
         when(userRepo.findById(1)).thenReturn(Optional.of(
-                new User(1, "Thamizharasan", "7142admin01", "thamizharasan2555@gamil.com", "09112005tmk", User.Role.ADMIN, null)));
+                new User(1, "Thamizharasan", "7142admin01", "thamizharasan2555@gamil.com", "09112005tmk", User.Role.ADMIN, LocalDate.now(), null)));
         User user = userService.getUserById(1);
         Assertions.assertEquals("Thamizharasan", user.getUsername());
         Assertions.assertTrue(()-> userService.getUserById(1).equals(user));

@@ -35,7 +35,7 @@ public class JwtUtils {
     }
 
     public String extractRole(String token){
-        return extractClaim(token, claims -> claims.get("role").toString());
+        return extractClaim(token, claims -> claims.get("roles").toString());
     }
 
     public Integer extractUserId(String token){
@@ -67,8 +67,13 @@ public class JwtUtils {
         //Extract role : To put the role in jwtToken
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         if (!authorities.isEmpty()) {
-            String role = authorities.iterator().next().getAuthority(); // role = "ROLE_ADMIN"
-            claims.put("role", role.replace("ROLE_", ""));  // replacing with "" so role: "ADMIN"
+
+            List<String> roles = authorities.stream() // role = "ROLE_ADMIN"
+                    .map(grantedAuthority -> grantedAuthority.getAuthority())
+                    .map(role -> role.replace("ROLE_", "")) // replacing with "" so role: "ADMIN"
+                    .toList();
+
+            claims.put("roles", roles);
         }
 
         return Jwts.builder()
