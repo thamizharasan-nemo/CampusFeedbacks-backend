@@ -6,6 +6,50 @@ It is designed for colleges or institutions where admins, instructors, and stude
 
 This project mainly focuses on backend architecture, security, role management, and real-world system design.
 
+## Problem statement
+
+- Most colleges lack a transparent and structured system to collect and analyze student feedback on instructors and courses.
+
+- Without proper feedback data and analytics, management cannot effectively evaluate teaching quality or make informed improvements.
+
+- CampusFeedbacks provides a secure, institution-based feedback system that enables students to share feedback and helps institutions analyze instructor performance and improve academic quality through data-driven insights.
+
+## Why this project exists
+
+In colleges, students and instructors play a major role in the overall quality of education.
+
+But in most institutions, management does not have a clear and structured way to understand how instructors are actually performing inside classrooms.
+
+Student feedback is usually collected manually or informally, which leads to:
+
+- lack of transparency
+
+- biased or incomplete data
+
+- no proper analytics to take decisions
+
+Because of this, colleges struggle to:
+
+- identify strong and weak teaching patterns
+
+- improve teaching methods
+
+- recognize or reward high-performing instructors
+
+- take corrective actions where needed
+
+This project solves that problem by providing a centralized feedback and analytics system where students can submit feedback for courses and instructors, either openly or anonymously.
+
+The system then converts feedback into structured data and analytics, helping institutions:
+
+- monitor teaching quality
+
+- track instructor performance over time
+
+- make data-driven decisions instead of assumptions
+
+- improve both teaching and learning experience
+
 ## What this project does
 
 * Supports multiple institutions.
@@ -151,49 +195,6 @@ So:
 
 - Instructors only see their assigned courses and feedbacks
 
-## Problem statement
-
-- Most colleges lack a transparent and structured system to collect and analyze student feedback on instructors and courses.
-
-- Without proper feedback data and analytics, management cannot effectively evaluate teaching quality or make informed improvements.
-
-- CampusFeedbacks provides a secure, institution-based feedback system that enables students to share feedback and helps institutions analyze instructor performance and improve academic quality through data-driven insights.
-
-## Why this project exists
-
-In colleges, students and instructors play a major role in the overall quality of education.
-
-But in most institutions, management does not have a clear and structured way to understand how instructors are actually performing inside classrooms.
-
-Student feedback is usually collected manually or informally, which leads to:
-
-- lack of transparency
-
-- biased or incomplete data
-
-- no proper analytics to take decisions
-
-Because of this, colleges struggle to:
-
-- identify strong and weak teaching patterns
-
-- improve teaching methods
-
-- recognize or reward high-performing instructors
-
-- take corrective actions where needed
-
-This project solves that problem by providing a centralized feedback and analytics system where students can submit feedback for courses and instructors, either openly or anonymously.
-
-The system then converts feedback into structured data and analytics, helping institutions:
-
-- monitor teaching quality
-
-- track instructor performance over time
-
-- make data-driven decisions instead of assumptions
-
-- improve both teaching and learning experience
 
 ## Status
 
