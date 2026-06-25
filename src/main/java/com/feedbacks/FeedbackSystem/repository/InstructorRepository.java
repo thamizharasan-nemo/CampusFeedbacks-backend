@@ -3,14 +3,12 @@ package com.feedbacks.FeedbackSystem.repository;
 import com.feedbacks.FeedbackSystem.DTO.analytics.FeedbacksByInstructor;
 import com.feedbacks.FeedbackSystem.DTO.analytics.InstructorRankingDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.TopRatedInstructorsDTO;
-import com.feedbacks.FeedbackSystem.model.Course;
 import com.feedbacks.FeedbackSystem.model.Instructor;
 import com.feedbacks.FeedbackSystem.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +24,13 @@ public interface InstructorRepository extends JpaRepository<Instructor, Integer>
     })
     Optional<Instructor> findByInstructorId(int instructorId);
 
+    @Query("""
+            SELECT inst FROM Instructor inst
+            JOIN FETCH inst.user u
+            WHERE inst.institution.institutionId = :institutionId
+            """)
+    List<Instructor> findAllInstructorByInstitution(@Param("institutionId") int institutionId);
+
     @Query(value = "SELECT i.instructorId AS instructorId, " +
             "i.user.username AS instructorName, " +
             "c.courseName AS courseName, " +
@@ -36,7 +41,7 @@ public interface InstructorRepository extends JpaRepository<Instructor, Integer>
             "WHERE i.isDeleted = false " +
             "GROUP BY i.instructorId, i.user.username, c.courseName "
     )
-    List<FeedbacksByInstructor> getAllFeedbacksByInstructor();
+    List<FeedbacksByInstructor> getAllFeedbacksToInstructor();
 
     @Query("SELECT i FROM Instructor i LEFT JOIN i.courses c WHERE c IS NULL")
     List<Instructor> findUnassignedInstructors();
@@ -78,7 +83,7 @@ public interface InstructorRepository extends JpaRepository<Instructor, Integer>
         SELECT i FROM Instructor i
         LEFT JOIN i.courses c
         WHERE c IS NULL
-          AND i.user.institution.institutionId = :institutionId
+          AND i.institution.institutionId = :institutionId
     """)
     List<Instructor> findUnassignedInstructors(@Param("institutionId") Integer institutionId);
 
@@ -89,7 +94,7 @@ public interface InstructorRepository extends JpaRepository<Instructor, Integer>
             i.avgRating
         )
         FROM Instructor i
-        WHERE i.user.institution.institutionId = :institutionId
+        WHERE i.institution.institutionId = :institutionId
         GROUP BY i.instructorId
         ORDER BY i.avgRating DESC
     """)
@@ -98,7 +103,7 @@ public interface InstructorRepository extends JpaRepository<Instructor, Integer>
 
     @Query("""
             SELECT COUNT(i) FROM Instructor i
-            WHERE i.user.institution.institutionId = :institutionId
+            WHERE i.institution.institutionId = :institutionId
             """)
-    Long findCountByInstitutionId(int institutionId);
+    Long findCountByInstitutionId(@Param("institutionId") int institutionId);
 }

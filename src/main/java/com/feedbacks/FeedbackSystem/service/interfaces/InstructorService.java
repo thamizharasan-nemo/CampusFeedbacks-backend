@@ -18,6 +18,8 @@ public interface InstructorService {
 
     List<InstructorResponseDTO> getAllInstructorsAsResponse();
 
+    List<InstructorResponseDTO> getAllInstructorsByInstitution();
+
     InstructorResponseDTO getInstructorResponseById(int instructorId);
 
     @Transactional

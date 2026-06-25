@@ -19,7 +19,7 @@ public interface UserService {
 
     List<User> getAllUsersById();
 
-    UserResponseDTO addUser(UserRequestDTO userRequestDTO, Integer institutionId);
+    UserResponseDTO addUser(UserRequestDTO userRequestDTO, String institutionCode);
 
     UserResponseDTO updateUser(int userId, UserRequestDTO userRequestDTO);
 

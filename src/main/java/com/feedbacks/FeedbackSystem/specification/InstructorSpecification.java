@@ -13,7 +13,8 @@ public class InstructorSpecification {
     public static Specification<Instructor> hasInstructorName(String instructorName) {
         return ((root, query, criteriaBuilder) ->
                 instructorName == null || instructorName.isEmpty() ? null
-                        : criteriaBuilder.like(criteriaBuilder.lower(root.get("instructorName")), "%"+instructorName.toLowerCase()+"%"));
+                        : criteriaBuilder.like(criteriaBuilder.lower(root.join("user").get("username")),
+                        "%" + instructorName.toLowerCase() + "%"));
     }
 
     public static Specification<Instructor> byAssignedCourseName(String courseName) {

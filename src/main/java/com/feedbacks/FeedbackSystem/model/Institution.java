@@ -2,18 +2,18 @@ package com.feedbacks.FeedbackSystem.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(
@@ -56,8 +56,9 @@ public class Institution {
     @JsonIgnore
     private List<Course> courses = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "institution", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Instructor> instructors = new ArrayList<>();
+
 }
 

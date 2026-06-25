@@ -1,5 +1,6 @@
 package com.feedbacks.FeedbackSystem.service.serviceImple;
 
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.PageResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.CourseRequestDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackCountDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.CourseResponseDTO;
@@ -76,6 +77,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public List<CourseResponseDTO> getAllUnassignedCoursesFromInstitution(){
+        return courseRepo.findAllUnassignedCourseByInstitution(SecurityUtils.getInstitutionId()).stream()
+                .map(course -> courseMapper.toResponse(course))
+                .toList();
+    }
+
+    @Override
     public CourseResponseDTO addCourse(CourseRequestDTO requestDTO) {
         Institution institution = institutionRepo.findById(SecurityUtils.getInstitutionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Institution not found"));
@@ -120,7 +128,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public void updateCourseStateOnFeedbackRemove(Course course, int rating){
         long count = course.getFeedbackCount() - 1;
-
         if (count == 0){
             course.setFeedbackCount(0L);
             course.setAvgRating(0.0);
@@ -261,16 +268,16 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<CourseResponseDTO> getCoursesScalable(Integer courseId,
-                                                      String courseName,
-                                                      Integer instructorId,
-                                                      String instructorName,
-                                                      Boolean popular,
-                                                      Integer minEnrollments,
-                                                      Double minAvgRating,
-                                                      String sortBy,
-                                                      String sortDirection,
-                                                      int page, int size) {
+    public PageResponseDTO<CourseResponseDTO> getCoursesScalable(Integer courseId,
+                                                                 String courseName,
+                                                                 Integer instructorId,
+                                                                 String instructorName,
+                                                                 Boolean popular,
+                                                                 Integer minEnrollments,
+                                                                 Double minAvgRating,
+                                                                 String sortBy,
+                                                                 String sortDirection,
+                                                                 int page, int size) {
         Sort sort = sortDirection.equalsIgnoreCase("DESC")
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
@@ -307,7 +314,16 @@ public class CourseServiceImpl implements CourseService {
 
 
         Page<Course> course = courseRepo.findAll(specification, pageable);
-        return course.map(courseMapper::toResponse);
+        Page<CourseResponseDTO> dtoPage = course.map(courseMapper::toResponse);
+
+        return new PageResponseDTO<>(
+                dtoPage.getContent(),
+                dtoPage.getNumber(),
+                dtoPage.getSize(),
+                dtoPage.getTotalElements(),
+                dtoPage.getTotalPages(),
+                dtoPage.isLast()
+        );
     }
 
     @Override
@@ -354,7 +370,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<CourseFeedbackCountDTO> getFeedbackCountAndAvg(){
-        return courseRepo.countFeedbacksAndAvgRatePerCourse();
+        return courseRepo.countFeedbacksAndAvgRatePerCourse(SecurityUtils.getInstitutionId());
     }
 
 
@@ -378,9 +394,18 @@ public class CourseServiceImpl implements CourseService {
             key = "#pageNumber + ':' + #pageSize"
     )
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<PopularCourseDTO> getPopularCourses(int pageNumber, int pageSize) {
+    public PageResponseDTO<PopularCourseDTO> getPopularCourses(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return courseRepo.findPopularCourses(pageable);
+        Page<PopularCourseDTO> dtoPage =  courseRepo.findPopularCourses(pageable);
+
+        return new PageResponseDTO<>(
+                dtoPage.getContent(),
+                dtoPage.getNumber(),
+                dtoPage.getSize(),
+                dtoPage.getTotalElements(),
+                dtoPage.getTotalPages(),
+                dtoPage.isLast()
+        );
     }
 
     // Slice<T> is useful for infinite scrolling or “Load More” UI. & Doesn't count data

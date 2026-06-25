@@ -2,7 +2,7 @@ package com.feedbacks.FeedbackSystem.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @SQLDelete(sql = "UPDATE instructor SET is_deleted = true WHERE instructor_id = ?")
 @FilterDef(name = "deletedInstructorFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedInstructorFilter", condition = "is_deleted = false")
@@ -23,6 +26,10 @@ public class Instructor {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "institution_id")
+    private Institution institution;
 
     private double avgRating;
     private long feedbackCount;

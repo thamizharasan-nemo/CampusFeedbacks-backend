@@ -1,12 +1,15 @@
 package com.feedbacks.FeedbackSystem.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "refresh_tokens", indexes = {
             @Index(columnList = "token", unique = true),
             @Index(columnList = "user_id")

@@ -1,5 +1,6 @@
 package com.feedbacks.FeedbackSystem.service.serviceImple;
 
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.PageResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.FeedbackRequestDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackSummary;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.FeedbackResponseDTO;
@@ -104,11 +105,8 @@ public class FeedbackServiceImpl implements FeedbackService {
         int courseInstitutionId = course.getInstitution().getInstitutionId();
         int instructorInstitutionId = instructor.getUser().getInstitution().getInstitutionId();
 
-        if (studentInstitutionId != courseInstitutionId ||
-                courseInstitutionId != instructorInstitutionId) {
-            throw new NotAllowedException(
-                    "Cross-institution feedback is not allowed"
-            );
+        if (studentInstitutionId != courseInstitutionId || courseInstitutionId != instructorInstitutionId) {
+            throw new NotAllowedException("Cross-institution feedback is not allowed");
         }
     }
 
@@ -291,6 +289,29 @@ public class FeedbackServiceImpl implements FeedbackService {
         feedbackRepo.deletePermanently(feedbackId, accessor.getInstitution().getInstitutionId());
     }
 
+    @Override
+    public PageResponseDTO<FeedbackResponseDTO> getAllByInstructorId(int instructorId, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Feedback> feedbacks = feedbackRepo
+                .findAllByInstructor_InstructorIdAndInstitutionId(
+                        instructorId,
+                        SecurityUtils.getInstitutionId(),
+                        pageable
+                );
+
+        Page<FeedbackResponseDTO> feedbackResponseDTOS =  feedbacks.map(feedback -> feedbackMapper.toResponse(feedback));
+
+        return new PageResponseDTO<>(
+                feedbackResponseDTOS.getContent(),
+                feedbackResponseDTOS.getNumber(),
+                feedbackResponseDTOS.getSize(),
+                feedbackResponseDTOS.getTotalElements(),
+                feedbackResponseDTOS.getTotalPages(),
+                feedbackResponseDTOS.isLast()
+        );
+    }
+
     //Sorting Method
     @Override
     public Sort sortingFunction(String sort){
@@ -330,15 +351,25 @@ public class FeedbackServiceImpl implements FeedbackService {
     }
 
     @Override
-    public Page<FeedbackResponseDTO> getFeedbackByStudent(int page, int size, String sort) {
-        User student = userService.getUserById(getCurrentUserId());
-        int institutionId = student.getInstitution().getInstitutionId();
-
+    public PageResponseDTO<FeedbackResponseDTO> getFeedbackByStudent(int page, int size, String sort) {
         Sort sorting = sortingFunction(sort);
         Pageable pageable = PageRequest.of(page, size, sorting);
 
-        Page<Feedback> feedbacks = feedbackRepo.findByStudent_UserIdAndInstitution_InstitutionId(student.getUserId(), institutionId, pageable);
-        return feedbacks.map(feedbackMapper::toResponse);
+        Page<Feedback> feedbacks = feedbackRepo
+                .findByStudent_UserIdAndInstitution_InstitutionId(
+                        SecurityUtils.getCurrentUserId(),
+                        SecurityUtils.getInstitutionId(),
+                        pageable
+                );
+        Page<FeedbackResponseDTO> dtoPage = feedbacks.map(feedbackMapper::toResponse);
+        return new PageResponseDTO<>(
+                dtoPage.getContent(),
+                dtoPage.getNumber(),
+                dtoPage.getSize(),
+                dtoPage.getTotalElements(),
+                dtoPage.getTotalPages(),
+                dtoPage.isLast()
+        );
     }
 
     @Override

@@ -66,14 +66,14 @@ public class JwtUtils {
 
         //Extract role : To put the role in jwtToken
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-        if (!authorities.isEmpty()) {
 
+        if (!authorities.isEmpty()) {
             List<String> roles = authorities.stream() // role = "ROLE_ADMIN"
                     .map(grantedAuthority -> grantedAuthority.getAuthority())
                     .map(role -> role.replace("ROLE_", "")) // replacing with "" so role: "ADMIN"
                     .toList();
 
-            claims.put("roles", roles);
+            claims.put("roles", roles); // Note: Frontend get roles = ['STUDENT', 'TEACHER'] - looks dump but just for learning
         }
 
         return Jwts.builder()

@@ -86,8 +86,9 @@ public class UserServiceImpl implements UserService {
 
     // ADD User
     @Override
-    public UserResponseDTO addUser(UserRequestDTO userRequestDTO, Integer institutionId) {
-        Institution institution = institutionRepo.findById(institutionId)
+    public UserResponseDTO addUser(UserRequestDTO userRequestDTO, String institutionCode) {
+
+        Institution institution = institutionRepo.findByInstitutionCode(institutionCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Institution not found"));
 
         Optional<User> isExist = userRepo.findByEmail(userRequestDTO.getEmail());
@@ -95,17 +96,16 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("This email already exists.");
         }
 
-        User user = new User();
-        user = userMapper.toEntity(institutionId, user, userRequestDTO);
+        User user = userMapper.toEntity(institutionCode, new User(), userRequestDTO);
         user.setInstitution(institution);
 
         userRepo.save(user);
 
         log.info(
-                "event=NEW_USER_REGISTERED userName={} userIdentity={} institutionId={}  userRole={} registeredAt={}",
+                "event=NEW_USER_REGISTERED userName={} userIdentity={} institutionCode={}  userRole={} registeredAt={}",
                 userRequestDTO.getUsername(),
                 userRequestDTO.getIdentityNo(),
-                institutionId,
+                institutionCode,
                 userRequestDTO.getRole(),
                 LocalDateTime.now()
         );
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("Email already exists.");
         }
 
-        userExist = userMapper.toEntity(institutionId, userExist, userRequestDTO);
+        userExist = userMapper.toEntity(userExist.getInstitution().getInstitutionCode(), userExist, userRequestDTO);
         userRepo.save(userExist);
 
         log.info(

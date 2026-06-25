@@ -26,12 +26,22 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer>,
                                                                      int institutionId,
                                                                      Pageable pageable);
 
+    @Query("""
+                SELECT f FROM Feedback f
+                WHERE f.instructor.instructorId = :instructorId
+                AND f.institution.institutionId = :institutionId
+            """)
+    Page<Feedback> findAllByInstructor_InstructorIdAndInstitutionId(@Param("instructorId")int instructorId, @Param("institutionId") int institutionId, Pageable pageable);
+
     @Query("SELECT f FROM Feedback f WHERE f.institution.institutionId = :institutionId")
     List<Feedback> getAllFeedbacksByInstituteId(@Param("institutionId") int institutionId);
 
-    Page<Feedback> findByStudent_UserIdAndInstitution_InstitutionId(int userId,
-                                                                    int institutionId,
-                                                                    Pageable pageable);
+    @Query("""
+            SELECT f FROM Feedback f 
+            WHERE f.student.userId = :userId 
+            AND f.institution.institutionId = :institutionId
+            """)
+    Page<Feedback> findByStudent_UserIdAndInstitution_InstitutionId(int userId, int institutionId, Pageable pageable);
 
     List<Feedback> findByStudent_UserIdAndCourse_CourseIdAndInstitution_InstitutionId(int userId,
                                                                                       int courseId,

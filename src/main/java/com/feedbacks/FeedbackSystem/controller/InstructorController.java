@@ -33,6 +33,14 @@ public class InstructorController {
         );
     }
 
+    @GetMapping("/institution")
+    public ResponseEntity<ApiResponse<List<InstructorResponseDTO>>> getAllInstructorsByInstitution() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Instructors fetched successfully",
+                        instructorService.getAllInstructorsByInstitution())
+        );
+    }
+
     @GetMapping("/admin/{instructorId}")
     public ResponseEntity<ApiResponse<Instructor>> getInstructorById(@PathVariable int instructorId) {
         return ResponseEntity.ok(
@@ -111,9 +119,7 @@ public class InstructorController {
     }
 
     @PutMapping("/course/{courseId}/instructor/{instructorId}")
-    public ResponseEntity<ApiResponse<InstructorResponseDTO>> assignCourse(
-            @PathVariable Integer instructorId,
-            @PathVariable Integer courseId) {
+    public ResponseEntity<ApiResponse<InstructorResponseDTO>> assignCourse(@PathVariable Integer instructorId, @PathVariable Integer courseId) {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Course assigned to instructor",
                         instructorService.assignCourseToInstructor(instructorId, courseId))
@@ -139,7 +145,7 @@ public class InstructorController {
         );
     }
 
-    @GetMapping("/unassigned/courses")
+    @GetMapping("/unassigned")
     public ResponseEntity<ApiResponse<List<InstructorResponseDTO>>> getAllUnassignedInstructors() {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Unassigned instructors fetched",

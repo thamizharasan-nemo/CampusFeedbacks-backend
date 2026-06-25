@@ -91,12 +91,12 @@ public class UserController {
     @PreAuthorize("permitAll()")
     @PostMapping
     public ResponseEntity<ApiResponse<UserResponseDTO>> addUser(@Valid @RequestBody UserRequestDTO userRequestDTO,
-                                                                @RequestParam Integer institutionId
+                                                                @RequestParam String institutionCode
     ) {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true, "User created successfully",
-                        userService.addUser(userRequestDTO, institutionId)
+                        userService.addUser(userRequestDTO, institutionCode)
                 )
         );
     }

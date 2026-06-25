@@ -3,7 +3,7 @@ package com.feedbacks.FeedbackSystem.security;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-// This class generate token for jwt refresh
+// This class generate refresh token for jwt refresh
 public class SecureRandomString {
 
     private static final SecureRandom secureRandom = new SecureRandom();

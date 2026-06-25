@@ -1,6 +1,7 @@
 package com.feedbacks.FeedbackSystem.controller;
 
 import com.feedbacks.FeedbackSystem.DTO.ApiResponse;
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.PageResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.FeedbackRequestDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackSummary;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.FeedbackResponseDTO;
@@ -108,6 +109,18 @@ public class FeedbackController {
         ));
     }
 
+    @GetMapping("/instructor")
+    public ResponseEntity<ApiResponse<PageResponseDTO<FeedbackResponseDTO>>> getAllByInstructor(
+            @RequestParam int instructorId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Feedback list fetched",
+                feedbackService.getAllByInstructorId(instructorId, page, size)
+        ));
+    }
+
     @GetMapping("/deleted")
     public ResponseEntity<ApiResponse<List<FeedbackResponseDTO>>> getSoftDeleted() {
         return ResponseEntity.ok(new ApiResponse<>(
@@ -175,7 +188,7 @@ public class FeedbackController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<Page<FeedbackResponseDTO>>> myFeedbacks(
+    public ResponseEntity<ApiResponse<PageResponseDTO<FeedbackResponseDTO>>> myFeedbacks(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "submittedAt,DESC") String sort) {

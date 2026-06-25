@@ -5,7 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 public class SecurityUtils {
 
-    private SecurityUtils() {} // prevent instantiation
+    private SecurityUtils() {} // prevents instantiation
 
     public static int getCurrentUserId() {
         return getPrincipal().getUserId();
@@ -19,6 +19,7 @@ public class SecurityUtils {
         return getPrincipal().getInstitutionId();
     }
 
+    // Get the current user from Principal
     private static CustomUserDetails getPrincipal() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

@@ -38,14 +38,14 @@ public class InstitutionController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{institutionId}")
-    public ResponseEntity<ApiResponse<InstitutionResponseDTO>> getInstitution(@PathVariable Integer institutionId) {
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER','STUDENT')")
+    @GetMapping("/current")
+    public ResponseEntity<ApiResponse<InstitutionResponseDTO>> getInstitutionByCurrentUser() {
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
                         "Institution fetched successfully",
-                        institutionService.getInstitutionById(institutionId)
+                        institutionService.getInstitutionById()
                 )
         );
     }

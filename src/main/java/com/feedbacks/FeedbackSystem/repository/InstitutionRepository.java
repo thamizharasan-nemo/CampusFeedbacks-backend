@@ -43,6 +43,6 @@ public interface InstitutionRepository extends JpaRepository<Institution, Intege
             SELECT i FROM Institution i
             WHERE i.createdBy.userId = :userId
             """)
-    Institution findByAdminId(int userId);
+    Optional<Institution> findByAdminId(@Param("userId") int userId);
 }
 

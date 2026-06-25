@@ -22,6 +22,7 @@ import com.feedbacks.FeedbackSystem.service.serviceImple.RefreshTokenServiceImpl
 import com.feedbacks.FeedbackSystem.service.serviceImple.UserServiceImpl;
 import com.feedbacks.FeedbackSystem.service.other_services.HtmlEmailBody;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,8 +30,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/v1/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -54,19 +59,17 @@ public class AuthController {
     }
 
     @PostMapping("/register/institution")
-    public ResponseEntity<ApiResponse<UserResponseDTO>> registerInstitution(
-            @Valid @RequestBody InstitutionRegistrationRequest request
-    ) {
+    public ResponseEntity<ApiResponse<UserResponseDTO>> registerInstitution(@Valid @RequestBody InstitutionRegistrationRequest request) {
         UserResponseDTO admin = institutionService.registerInstitution(request);
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Institution and admin registered successfully", admin)
         );
     }
 
-    @PostMapping("/register/{institutionId}")
+    @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponseDTO>> registerUser(@Valid @RequestBody UserRequestDTO user,
-                                                                     @PathVariable Integer institutionId) {
-        UserResponseDTO savedUser = userService.addUser(user, institutionId);
+                                                                     @RequestParam String institutionCode) {
+        UserResponseDTO savedUser = userService.addUser(user, institutionCode);
         emailBody.registrationEmail(savedUser);
         // because of Async in this method, savedUser returned before the mail sent
         return ResponseEntity.ok(
@@ -98,6 +101,14 @@ public class AuthController {
 
         RefreshToken refreshToken = refreshTokenService.issue(user);
 
+        log.info(
+                "USER_LOGGED_IN | username={} | role={} | email={} | institutionId={}",
+                user.getUsername(),
+                user.getRole(),
+                user.getEmail(),
+                user.getInstitution().getInstitutionId()
+        );
+
         return ResponseEntity.ok(
                 new ApiResponse<>(
                         true,
@@ -108,9 +119,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<JwtResponseDTO>> refresh(
-            @RequestBody JwtRefreshTokenDTO request
-    ) {
+    public ResponseEntity<ApiResponse<JwtResponseDTO>> refresh(@RequestBody JwtRefreshTokenDTO request) {
         RefreshToken current = refreshTokenService.verifyUsable(request.getRefreshToken());
         User user = current.getUser();
         // Rotate old refresh token with a new one

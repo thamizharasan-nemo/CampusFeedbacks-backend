@@ -1,5 +1,6 @@
 package com.feedbacks.FeedbackSystem.service.interfaces;
 
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.PageResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.FeedbackRequestDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.FeedbackResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackSummary;
@@ -29,6 +30,8 @@ public interface FeedbackService {
 
     void deleteFeedbackById(int feedbackId);
 
+    PageResponseDTO<FeedbackResponseDTO> getAllByInstructorId(int instructorId, int page, int size);
+
     FeedbackResponseDTO restoreFeedback(int feedbackId);
 
     void deleteFeedbackPermanently(int feedbackId);
@@ -39,14 +42,10 @@ public interface FeedbackService {
 
     Sort sortingFunction(String sort);
 
-    Page<FeedbackResponseDTO> getSortedFeedbackByCourseId(int courseId,
-                                                          int page,
-                                                          int size,
-                                                          String sort);
+    Page<FeedbackResponseDTO> getSortedFeedbackByCourseId(int courseId, int page,
+                                                          int size, String sort);
 
-    Page<FeedbackResponseDTO> getFeedbackByStudent(int page,
-                                                   int size,
-                                                   String sort);
+    PageResponseDTO<FeedbackResponseDTO> getFeedbackByStudent(int page, int size, String sort);
 
 
     List<FeedbackResponseDTO> getFilteredFeedback(Integer courseId,

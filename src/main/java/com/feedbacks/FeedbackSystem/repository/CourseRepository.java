@@ -4,6 +4,7 @@ import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackCountDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseRankingDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.PopularCourseDTO;
 import com.feedbacks.FeedbackSystem.model.Course;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,27 +47,33 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
     void deletePermanently(@Param("courseId")Integer courseId);
 
 
-    @Query("SELECT c.courseId AS courseId, " +
-            "c.courseName AS courseName, " +
-            "COUNT(f) AS feedbackCount, " +
-            "i.user.username AS instructorName " +
+    @Query("SELECT new com.feedbacks.FeedbackSystem.DTO.analytics.PopularCourseDTO(" +
+            "c.courseId, " +
+            "c.courseName, " +
+            "COUNT(f), " +
+            "i.user.username, " +
+            "c.avgRating" +
+            ") " +
             "FROM Course c " +
             "LEFT JOIN c.instructor i " +
             "LEFT JOIN c.feedbacks f " +
-            "GROUP BY c.courseId, c.courseName " +
-            "ORDER BY feedbackCount DESC")
-    List<PopularCourseDTO> findPopularCourses(Pageable pageable);
+            "GROUP BY c.courseId, c.courseName, i.user.username " +
+            "ORDER BY COUNT(f) DESC")
+    Page<PopularCourseDTO> findPopularCourses(Pageable pageable);
 
     // Slice class to do "load more" in frontend
-    @Query("SELECT c.courseId AS courseId, " +
-            "c.courseName AS courseName, " +
-            "COUNT(f) AS feedbackCount, " +
-            "i.user.username AS instructorName " +
+    @Query("SELECT new com.feedbacks.FeedbackSystem.DTO.analytics.PopularCourseDTO(" +
+            "c.courseId, " +
+            "c.courseName, " +
+            "COUNT(f), " +
+            "i.user.username, " +
+            "c.avgRating" +
+            ") " +
             "FROM Course c " +
             "LEFT JOIN c.instructor i " +
             "LEFT JOIN c.feedbacks f " +
-            "GROUP BY c.courseId, c.courseName " +
-            "ORDER BY feedbackCount ASC")
+            "GROUP BY c.courseId, c.courseName, i.user.username " +
+            "ORDER BY COUNT(f) ASC")
     Slice<PopularCourseDTO> findUnPopularCourses(Pageable pageable);
 
     @Query("SELECT c FROM Course c " +
@@ -89,6 +97,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
             """)
     List<CourseRankingDTO> getCourseRaking(Pageable pageable);
 
+    @Query("""
+            SELECT c FROM Course c
+            WHERE c.instructor IS NULL AND c.institution.institutionId = :institutionId
+            """)
+    List<Course> findAllUnassignedCourseByInstitution(@Param("institutionId") Integer institutionId);
 
     // Institution-scoped search
     @Query("""
@@ -137,4 +150,5 @@ public interface CourseRepository extends JpaRepository<Course, Integer>,
         AND c.courseName LIKE %:courseName%
     """)
     List<Course> searchByNameAndInstitution(Integer institutionId, String courseName);
+
 }

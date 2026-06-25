@@ -1,5 +1,6 @@
 package com.feedbacks.FeedbackSystem.service.interfaces;
 
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.PageResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.CourseRequestDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.CourseResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackCountDTO;
@@ -41,16 +42,18 @@ public interface CourseService {
 
     CourseResponseDTO unassignInstructorToCourse(int courseId);
 
-    Page<CourseResponseDTO> getCoursesScalable(Integer courseId,
-                                               String courseName,
-                                               Integer instructorId,
-                                               String instructorName,
-                                               Boolean popular,
-                                               Integer minEnrollments,
-                                               Double minAvgRating,
-                                               String sortBy,
-                                               String sortDirection,
-                                               int page, int size);
+    List<CourseResponseDTO> getAllUnassignedCoursesFromInstitution();
+
+    PageResponseDTO<CourseResponseDTO> getCoursesScalable(Integer courseId,
+                                                          String courseName,
+                                                          Integer instructorId,
+                                                          String instructorName,
+                                                          Boolean popular,
+                                                          Integer minEnrollments,
+                                                          Double minAvgRating,
+                                                          String sortBy,
+                                                          String sortDirection,
+                                                          int page, int size);
 
     List<CourseResponseDTO> searchCourseByName(String courseName);
 
@@ -60,7 +63,7 @@ public interface CourseService {
 
     List<CourseResponseDTO> getSortedCourses(String sortBy);
 
-    List<PopularCourseDTO> getPopularCourses(int pageNumber, int pageSize);
+    PageResponseDTO<PopularCourseDTO> getPopularCourses(int pageNumber, int pageSize);
 
     // Slice<T> is useful for infinite scrolling or “Load More” UI. & Doesn't count data
     Slice<PopularCourseDTO> getUnPopularCourses(int pageNumber, int pageSize);

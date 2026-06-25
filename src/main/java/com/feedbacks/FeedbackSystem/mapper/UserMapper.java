@@ -25,9 +25,9 @@ public class UserMapper {
         this.institutionRepo = institutionRepo;
     }
 
-    public User toEntity(int institutionId, User user, @Valid UserRequestDTO dto){
+    public User toEntity(String institutionCode, User user, @Valid UserRequestDTO dto){
 
-        Institution institution = institutionRepo.findById(institutionId)
+        Institution institution = institutionRepo.findByInstitutionCode(institutionCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Institution not found"));
 
         user.setUsername(dto.getUsername());

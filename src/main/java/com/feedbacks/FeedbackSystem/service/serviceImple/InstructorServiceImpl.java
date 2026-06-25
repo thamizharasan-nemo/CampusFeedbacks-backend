@@ -66,6 +66,15 @@ public class InstructorServiceImpl implements InstructorService {
     }
 
     @Override
+    public List<InstructorResponseDTO> getAllInstructorsByInstitution(){
+        List<Instructor> instructorList = instructorRepo
+                .findAllInstructorByInstitution(SecurityUtils.getInstitutionId());
+        return instructorList.stream()
+                .map(instructor -> instructorMapper.toResponse(instructor))
+                .toList();
+    }
+
+    @Override
     public Instructor getInstructorById(Integer instructorId) {
         return instructorRepo.findByInstructorId(instructorId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -278,7 +287,7 @@ public class InstructorServiceImpl implements InstructorService {
     @Override
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<FeedbacksByInstructor> getAllFeedbacksByInstructor(){
-        return instructorRepo.getAllFeedbacksByInstructor();
+        return instructorRepo.getAllFeedbacksToInstructor();
     }
 
     @Override

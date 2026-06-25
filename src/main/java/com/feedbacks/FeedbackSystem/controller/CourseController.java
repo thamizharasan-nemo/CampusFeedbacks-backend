@@ -1,17 +1,15 @@
 package com.feedbacks.FeedbackSystem.controller;
 
 import com.feedbacks.FeedbackSystem.DTO.ApiResponse;
+import com.feedbacks.FeedbackSystem.DTO.EntityDTO.PageResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.requestDTOs.CourseRequestDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.CourseFeedbackCountDTO;
 import com.feedbacks.FeedbackSystem.DTO.EntityDTO.responseDTOs.CourseResponseDTO;
 import com.feedbacks.FeedbackSystem.DTO.analytics.PopularCourseDTO;
 import com.feedbacks.FeedbackSystem.model.Course;
-import com.feedbacks.FeedbackSystem.security.SecurityUtils;
 import com.feedbacks.FeedbackSystem.service.serviceImple.CourseServiceImpl;
 import com.feedbacks.FeedbackSystem.service.other_services.HtmlEmailBody;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +43,23 @@ public class CourseController {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Courses fetched successfully",
                         courseService.getAllCoursesDTO())
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all/institution")
+    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getAllCoursesByInstitution() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Institution courses fetched",
+                        courseService.getCoursesByInstitution())
+        );
+    }
+
+    @GetMapping("/all/unassigned/institution")
+    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getAllUnassignedCoursesByInstitution() {
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Unassigned institution courses fetched",
+                        courseService.getAllUnassignedCoursesFromInstitution())
         );
     }
 
@@ -105,15 +120,6 @@ public class CourseController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/all/institution")
-    public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getCoursesByInstitution() {
-        return ResponseEntity.ok(
-                new ApiResponse<>(true, "Institution courses fetched",
-                        courseService.getCoursesByInstitution())
-        );
-    }
-
 
     @GetMapping("/soft/deleted")
     public ResponseEntity<ApiResponse<List<CourseResponseDTO>>> getAllDeletedCourses() {
@@ -151,9 +157,9 @@ public class CourseController {
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN','INSTRUCTOR','STUDENT')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER','STUDENT')")
     @GetMapping("/institution/search")
-    public ResponseEntity<ApiResponse<Page<CourseResponseDTO>>> searchCoursesByInstitution(
+    public ResponseEntity<ApiResponse<PageResponseDTO<CourseResponseDTO>>> searchCoursesByInstitution(
             @RequestParam(required = false) Integer courseId,
             @RequestParam(required = false) String courseName,
             @RequestParam(required = false) Integer instructorId,
@@ -209,7 +215,7 @@ public class CourseController {
 
 
     @GetMapping("/counts/ratings")
-    public ResponseEntity<ApiResponse<List<CourseFeedbackCountDTO>>> getFeedbackCountAndAvgRating() {
+    public ResponseEntity<ApiResponse<List<CourseFeedbackCountDTO>>> getFeedbackCountAndAvgRatingByInstitution() {
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Feedback analytics fetched",
                         courseService.getFeedbackCountAndAvg())
@@ -217,7 +223,7 @@ public class CourseController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<ApiResponse<List<PopularCourseDTO>>> getPopularCourses(
+    public ResponseEntity<ApiResponse<PageResponseDTO<PopularCourseDTO>>> getPopularCourses(
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize) {
 

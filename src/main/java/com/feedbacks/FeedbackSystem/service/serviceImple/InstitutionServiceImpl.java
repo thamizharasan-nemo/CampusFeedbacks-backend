@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -45,7 +46,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     public UserResponseDTO registerInstitution(InstitutionRegistrationRequest registerRequest) {
 
         if (institutionRepo.existsByInstitutionCode(registerRequest.getInstitutionCode())) {
-            throw new BadRequestException("Institution code already exists");
+            throw new BadRequestException("Institution code "+ registerRequest.getInstitutionCode() +" already exists");
         }
 
         if (institutionRepo.existsByEmail(registerRequest.getInstitutionEmail())) {
@@ -91,8 +92,8 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public InstitutionResponseDTO getInstitutionById(int institutionId) {
-        Institution institution = institutionRepo.findById(institutionId)
+    public InstitutionResponseDTO getInstitutionById() {
+        Institution institution = institutionRepo.findById(SecurityUtils.getInstitutionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Institution not found"));
         return mapper.toResponse(institution);
     }
@@ -107,12 +108,10 @@ public class InstitutionServiceImpl implements InstitutionService {
 
     @Override
     public InstitutionResponseDTO updateInstitution(InstitutionRequestDTO dto) {
-        Institution institution = institutionRepo.findByAdminId(SecurityUtils.getCurrentUserId());
-        if (institution == null ){
-            throw new ResourceNotFoundException("Institution not found");
-        }
+        Institution institution = institutionRepo.findByAdminId(SecurityUtils.getCurrentUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("The requested institution not found"));
 
-        mapper.toEntity(institution, dto);
+        institution = mapper.toEntity(institution, dto);
         institutionRepo.save(institution);
         return mapper.toResponse(institution);
     }
@@ -143,4 +142,6 @@ public class InstitutionServiceImpl implements InstitutionService {
     public Long totalCourses() {
         return institutionRepo.totalCoursesByInstitution(SecurityUtils.getInstitutionId());
     }
+
+
 }

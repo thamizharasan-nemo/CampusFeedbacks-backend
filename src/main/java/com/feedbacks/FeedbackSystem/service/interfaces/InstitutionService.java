@@ -13,7 +13,7 @@ public interface InstitutionService {
 
     InstitutionResponseDTO createInstitution(InstitutionRequestDTO dto);
 
-    InstitutionResponseDTO getInstitutionById(int institutionId);
+    InstitutionResponseDTO getInstitutionById();
 
     List<InstitutionResponseDTO> getAllInstitutions();
 

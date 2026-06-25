@@ -31,7 +31,7 @@ public class UserRequestDTO {
     @Enumerated(EnumType.STRING)
     // enum value but given as string
     //ex: in postman we give role as "role": "STUDENT" -> as string
-    @NotNull(message = "Role must be either ADMIN or STUDENT")
+    @NotNull(message = "Role must be either ADMIN, STUDENT or TEACHER")
     private User.Role role;
 
 }
